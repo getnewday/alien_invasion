@@ -65,6 +65,9 @@ def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bul
     """ 在玩家单击 Play 按钮时开始新游戏 """
     botton_clicked = play_button.rect.collidepoint(mouse_x,mouse_y)
     if botton_clicked and not stats.game_active:
+        # 重置游戏设置
+        ai_settings.initialize_dynamic_settings()
+
         # 隐藏光标
         pygame.mouse.set_visible(False)
         # 重置游戏统计信息
@@ -86,7 +89,7 @@ def fire_bullet(ai_settings, screen, ship, bullets):
         new_bullet = Bullet(ai_settings,screen,ship)
         bullets.add(new_bullet)
 
-def update_screen(ai_settings, screen, stats,ship, aliens, bullets, play_button):
+def update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_button):
     """更新屏幕上的图像，并切换到新屏幕"""
     # 每次循环时都会重绘屏幕
     screen.fill(ai_settings.bg_color)
@@ -95,7 +98,10 @@ def update_screen(ai_settings, screen, stats,ship, aliens, bullets, play_button)
         bullet.draw_bullet()
     ship.blitme()
     aliens.draw(screen)
-    
+
+    # 显示得分
+    sb.show_score()
+
     # 如果游戏处于非活动状态,就绘制 Play 按钮
     if not stats.game_active:
         play_button.draw_button()
@@ -122,6 +128,7 @@ def check_bullet_alien_collisions(ai_settings,screen,ship,aliens,bullets):
     if len(aliens) == 0:
         # 删除现有的所有子弹,并创建一个新的外星人群
         bullets.empty()
+        ai_settings.increase_speed()
         create_fleet(ai_settings,screen,ship,aliens)
 
 def get_number_aliens_x(ai_settings,alien_width):
